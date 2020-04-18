@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Application.Dtos;
 using AutoMapper;
@@ -12,7 +13,6 @@ namespace Application.Mapping
             CreateMap<Make, MakeDto>();
             CreateMap<Model, IdNameDto>();
             CreateMap<Vehicle, VehicleDto>()
-                .ForMember(vd => vd.Make, opt => opt.MapFrom(v => v.Model.Make))
                 .ForMember(vd => vd.Contact, opt => opt.MapFrom(v => new ContactDto { Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone }))
                 .ForMember(vd => vd.Features, opt => opt.MapFrom(v => v.Features.Select(vf => vf.FeatureId)));
 
@@ -26,8 +26,9 @@ namespace Application.Mapping
                 {
                     var removedFeatures = v.Features
                         .Where(vf => !vd.Features.Contains(vf.FeatureId));
+                    var cloned = new List<VehicleFeature>(removedFeatures);
 
-                    foreach (var vehicleFeature in removedFeatures)
+                    foreach (var vehicleFeature in cloned)
                     {
                         v.Features.Remove(vehicleFeature);
                     }

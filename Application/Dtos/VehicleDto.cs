@@ -9,9 +9,7 @@ namespace Application.Dtos
     {
         public int Id { get; set; }
 
-        public IdNameDto Model { get; set; }
-
-        public IdNameDto Make { get; set; }
+        public int ModelId { get; set; }
 
         public bool IsRegistered { get; set; }
 
