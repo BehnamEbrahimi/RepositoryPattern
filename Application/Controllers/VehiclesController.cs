@@ -18,10 +18,10 @@ namespace Application.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<VehicleDto>> Create(VehicleDto vehicleDto)
+        public async Task<ActionResult<VehicleDto>> Create(SaveVehicleDto SaveVehicleDto)
         {
             var model = await _context.Models
-                .FindAsync(vehicleDto.ModelId);
+                .FindAsync(SaveVehicleDto.ModelId);
             if (model == null)
             {
                 ModelState.AddModelError("Model", "Invalid Id");
@@ -29,17 +29,24 @@ namespace Application.Controllers
                 return BadRequest(ModelState);
             }
 
-            var vehicle = Mapper.Map<VehicleDto, Vehicle>(vehicleDto);
+            var vehicle = Mapper.Map<SaveVehicleDto, Vehicle>(SaveVehicleDto);
             vehicle.LastUpdate = DateTime.Now;
 
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
 
+            vehicle = await _context.Vehicles
+                .Include(v => v.Features)
+                    .ThenInclude(vf => vf.Feautre)
+                .Include(v => v.Model)
+                    .ThenInclude(m => m.Make)
+                .SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+
             return Mapper.Map<Vehicle, VehicleDto>(vehicle);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<VehicleDto>> Edit(int id, VehicleDto vehicleDto)
+        public async Task<ActionResult<VehicleDto>> Edit(int id, SaveVehicleDto SaveVehicleDto)
         {
             var vehicleInDb = await _context.Vehicles
                 .Include(v => v.Features) //We need Features in mapping.
@@ -50,10 +57,17 @@ namespace Application.Controllers
                 return NotFound();
             }
 
-            Mapper.Map<VehicleDto, Vehicle>(vehicleDto, vehicleInDb);
+            Mapper.Map<SaveVehicleDto, Vehicle>(SaveVehicleDto, vehicleInDb);
             vehicleInDb.LastUpdate = DateTime.Now;
 
             await _context.SaveChangesAsync();
+
+            vehicleInDb = await _context.Vehicles
+                .Include(v => v.Features)
+                    .ThenInclude(vf => vf.Feautre)
+                .Include(v => v.Model)
+                    .ThenInclude(m => m.Make)
+                .SingleOrDefaultAsync(v => v.Id == id);
 
             return Mapper.Map<Vehicle, VehicleDto>(vehicleInDb);
         }
@@ -80,6 +94,9 @@ namespace Application.Controllers
         {
             var vehicle = await _context.Vehicles
                 .Include(v => v.Features)
+                    .ThenInclude(vf => vf.Feautre)
+                .Include(v => v.Model)
+                    .ThenInclude(m => m.Make)
                 .SingleOrDefaultAsync(v => v.Id == id);
 
             if (vehicle == null)
