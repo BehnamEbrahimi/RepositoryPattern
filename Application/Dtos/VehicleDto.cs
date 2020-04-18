@@ -20,11 +20,11 @@ namespace Application.Dtos
 
         public DateTime LastUpdate { get; set; }
 
-        public ICollection<IdNameDto> Features { get; set; }
+        public ICollection<int> Features { get; set; }
 
         public VehicleDto()
         {
-            Features = new Collection<IdNameDto>();
+            Features = new Collection<int>();
         }
     }
 }
