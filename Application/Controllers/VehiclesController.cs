@@ -2,26 +2,28 @@ using System;
 using System.Threading.Tasks;
 using Application.Dtos;
 using Domain;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Application.Controllers
 {
     public class VehiclesController : BaseController
     {
-        private readonly DataContext _context;
+        private readonly IVehicleRepository _vehicleRepository;
+        private readonly IModelRepository _modelRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public VehiclesController(DataContext context)
+        public VehiclesController(IVehicleRepository vehicleRepository, IModelRepository modelRepository, IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _vehicleRepository = vehicleRepository;
+            _modelRepository = modelRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost]
-        public async Task<ActionResult<VehicleDto>> Create(SaveVehicleDto SaveVehicleDto)
+        public async Task<ActionResult<VehicleDto>> Create(SaveVehicleDto saveVehicleDto)
         {
-            var model = await _context.Models
-                .FindAsync(SaveVehicleDto.ModelId);
+            var model = await _modelRepository.Details(saveVehicleDto.ModelId);
             if (model == null)
             {
                 ModelState.AddModelError("Model", "Invalid Id");
@@ -29,45 +31,33 @@ namespace Application.Controllers
                 return BadRequest(ModelState);
             }
 
-            var vehicle = Mapper.Map<SaveVehicleDto, Vehicle>(SaveVehicleDto);
+            var vehicle = Mapper.Map<SaveVehicleDto, Vehicle>(saveVehicleDto);
             vehicle.LastUpdate = DateTime.Now;
 
-            _context.Vehicles.Add(vehicle);
-            await _context.SaveChangesAsync();
+            _vehicleRepository.Create(vehicle);
+            await _unitOfWork.CompleteAsync();
 
-            vehicle = await _context.Vehicles
-                .Include(v => v.Features)
-                    .ThenInclude(vf => vf.Feautre)
-                .Include(v => v.Model)
-                    .ThenInclude(m => m.Make)
-                .SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+            vehicle = await _vehicleRepository.Details(vehicle.Id);
 
             return Mapper.Map<Vehicle, VehicleDto>(vehicle);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<VehicleDto>> Edit(int id, SaveVehicleDto SaveVehicleDto)
+        public async Task<ActionResult<VehicleDto>> Edit(int id, SaveVehicleDto saveVehicleDto)
         {
-            var vehicleInDb = await _context.Vehicles
-                .Include(v => v.Features) //We need Features in mapping.
-                .SingleOrDefaultAsync(v => v.Id == id);
+            var vehicleInDb = await _vehicleRepository.Details(id);
 
             if (vehicleInDb == null)
             {
                 return NotFound();
             }
 
-            Mapper.Map<SaveVehicleDto, Vehicle>(SaveVehicleDto, vehicleInDb);
+            Mapper.Map<SaveVehicleDto, Vehicle>(saveVehicleDto, vehicleInDb);
             vehicleInDb.LastUpdate = DateTime.Now;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.CompleteAsync();
 
-            vehicleInDb = await _context.Vehicles
-                .Include(v => v.Features)
-                    .ThenInclude(vf => vf.Feautre)
-                .Include(v => v.Model)
-                    .ThenInclude(m => m.Make)
-                .SingleOrDefaultAsync(v => v.Id == id);
+            vehicleInDb = await _vehicleRepository.Details(id);
 
             return Mapper.Map<Vehicle, VehicleDto>(vehicleInDb);
         }
@@ -75,16 +65,15 @@ namespace Application.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<int>> Delete(int id)
         {
-            var vehicle = await _context.Vehicles
-                .FindAsync(id);
+            var vehicle = await _vehicleRepository.Details(id, false);
 
             if (vehicle == null)
             {
                 return NotFound();
             }
 
-            _context.Vehicles.Remove(vehicle);
-            await _context.SaveChangesAsync();
+            _vehicleRepository.Delete(vehicle);
+            await _unitOfWork.CompleteAsync();
 
             return id;
         }
@@ -92,12 +81,7 @@ namespace Application.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<VehicleDto>> Get(int id)
         {
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Features)
-                    .ThenInclude(vf => vf.Feautre)
-                .Include(v => v.Model)
-                    .ThenInclude(m => m.Make)
-                .SingleOrDefaultAsync(v => v.Id == id);
+            var vehicle = await _vehicleRepository.Details(id);
 
             if (vehicle == null)
             {

@@ -2,27 +2,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Dtos;
 using Domain;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Application.Controllers
 {
     public class MakesController : BaseController
     {
-        private readonly DataContext _context;
+        private readonly IMakeRepository _makeRepository;
 
-        public MakesController(DataContext context)
+        public MakesController(IMakeRepository makeRepository)
         {
-            _context = context;
+            _makeRepository = makeRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<MakeDto>>> Get()
         {
-            var makes = await _context.Makes
-                .Include(m => m.Models)
-                .ToListAsync();
+            var makes = await _makeRepository.List();
 
             return Mapper.Map<List<Make>, List<MakeDto>>(makes);
         }
