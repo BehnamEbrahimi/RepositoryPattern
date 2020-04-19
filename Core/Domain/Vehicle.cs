@@ -9,8 +9,10 @@ namespace Core.Domain
     {
         public int Id { get; set; }
 
-        public int ModelId { get; set; }
+        public string UserId { get; set; }
+        public User User { get; set; }
 
+        public int ModelId { get; set; }
         public Model Model { get; set; }
 
         public bool IsRegistered { get; set; }

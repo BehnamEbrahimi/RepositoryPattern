@@ -62,7 +62,8 @@ namespace Persistence.Repositories
             {
                 ["make"] = v => v.Model.Make.Name,
                 ["model"] = v => v.Model.Name,
-                ["contactName"] = v => v.ContactName
+                ["contactName"] = v => v.ContactName,
+                ["userId"] = v => v.UserId,
             };
             query = query.ApplyOrdering(filter, path);
             envelope.TotalItems = await query.CountAsync();

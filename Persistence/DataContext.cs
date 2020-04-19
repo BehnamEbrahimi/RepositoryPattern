@@ -1,9 +1,10 @@
 ﻿using Core.Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DbSet<Make> Makes { get; set; }
         public DbSet<Model> Models { get; set; }
@@ -16,6 +17,8 @@ namespace Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<VehicleFeature>()
                 .HasKey(vf => new { vf.VehicleId, vf.FeatureId });
         }

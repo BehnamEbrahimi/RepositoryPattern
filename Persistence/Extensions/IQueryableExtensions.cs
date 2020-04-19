@@ -18,6 +18,9 @@ namespace Persistence.Extensions
             if (filter.ModelId.HasValue)
                 query = query.Where(v => v.ModelId == filter.ModelId.Value);
 
+            if (!string.IsNullOrWhiteSpace(filter.UserId))
+                query = query.Where(v => v.UserId == filter.UserId);
+
             return query;
         }
 

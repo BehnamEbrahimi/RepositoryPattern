@@ -24,10 +24,11 @@ namespace Application.Mapping
                 .ForMember(vd => vd.Make, opt => opt.MapFrom(v => v.Model.Make))
                 .ForMember(vd => vd.Contact, opt => opt.MapFrom(v => new ContactDto { Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone }))
                 .ForMember(vd => vd.Features, opt => opt.MapFrom(v => v.Features.Select(vf => new IdNameDto { Id = vf.FeatureId, Name = vf.Feautre.Name })));
+            CreateMap<User, ProfileDto>()
+                .ForMember(p => p.VehiclesCount, opt => opt.MapFrom(u => u.Vehicles.Count()));
 
             CreateMap<VehicleFilterDto, VehicleFilter>();
             CreateMap<SaveVehicleDto, Vehicle>()
-                .ForMember(v => v.Id, opt => opt.Ignore())
                 .ForMember(v => v.ContactName, opt => opt.MapFrom(svd => svd.Contact.Name))
                 .ForMember(v => v.ContactEmail, opt => opt.MapFrom(svd => svd.Contact.Email))
                 .ForMember(v => v.ContactPhone, opt => opt.MapFrom(svd => svd.Contact.Phone))

@@ -11,14 +11,18 @@ namespace Application.Controllers
     public class VehiclesController : BaseController
     {
         private readonly IVehicleRepository _vehicleRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IModelRepository _modelRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserAccessor _userAccessor;
 
-        public VehiclesController(IVehicleRepository vehicleRepository, IModelRepository modelRepository, IUnitOfWork unitOfWork)
+        public VehiclesController(IVehicleRepository vehicleRepository, IUserRepository userRepository, IModelRepository modelRepository, IUnitOfWork unitOfWork, IUserAccessor userAccessor)
         {
             _vehicleRepository = vehicleRepository;
+            _userRepository = userRepository;
             _modelRepository = modelRepository;
             _unitOfWork = unitOfWork;
+            _userAccessor = userAccessor;
         }
 
         [HttpPost]
@@ -26,13 +30,12 @@ namespace Application.Controllers
         {
             var model = await _modelRepository.Details(saveVehicleDto.ModelId);
             if (model == null)
-            {
-                ModelState.AddModelError("Model", "Invalid Id");
+                return BadRequest("Invalid ModelId");
 
-                return BadRequest(ModelState);
-            }
+            var user = await _userRepository.Details(_userAccessor.GetCurrentUsername());
 
             var vehicle = Mapper.Map<SaveVehicleDto, Vehicle>(saveVehicleDto);
+            vehicle.User = user;
             vehicle.LastUpdate = DateTime.Now;
 
             _vehicleRepository.Create(vehicle);
@@ -49,9 +52,11 @@ namespace Application.Controllers
             var vehicleInDb = await _vehicleRepository.Details(id);
 
             if (vehicleInDb == null)
-            {
                 return NotFound();
-            }
+
+            var user = await _userRepository.Details(_userAccessor.GetCurrentUsername());
+            if (user.Id != vehicleInDb.UserId)
+                return Forbid();
 
             Mapper.Map<SaveVehicleDto, Vehicle>(saveVehicleDto, vehicleInDb);
             vehicleInDb.LastUpdate = DateTime.Now;
@@ -69,9 +74,11 @@ namespace Application.Controllers
             var vehicle = await _vehicleRepository.Details(id, false);
 
             if (vehicle == null)
-            {
                 return NotFound();
-            }
+
+            var user = await _userRepository.Details(_userAccessor.GetCurrentUsername());
+            if (user.Id != vehicle.UserId)
+                return Forbid();
 
             _vehicleRepository.Delete(vehicle);
             await _unitOfWork.CompleteAsync();
@@ -85,9 +92,7 @@ namespace Application.Controllers
             var vehicle = await _vehicleRepository.Details(id);
 
             if (vehicle == null)
-            {
                 return NotFound();
-            }
 
             return Mapper.Map<Vehicle, VehicleDto>(vehicle);
         }
