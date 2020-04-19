@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Domain;
-using Domain.Interfaces;
+using Core.Domain;
+using Core.Interfaces;
 
 namespace Persistence.Repositories
 {

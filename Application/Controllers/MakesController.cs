@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Dtos;
-using Domain;
-using Domain.Interfaces;
+using Core.Domain;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers

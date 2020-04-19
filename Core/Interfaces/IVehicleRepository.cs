@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
-using Domain.Types;
+using Core.Domain;
+using Core.Types;
 
-namespace Domain.Interfaces
+namespace Core.Interfaces
 {
     public interface IVehicleRepository
     {

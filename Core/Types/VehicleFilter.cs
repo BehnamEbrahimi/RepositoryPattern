@@ -1,6 +1,6 @@
-using Domain.Interfaces;
+using Core.Interfaces;
 
-namespace Domain.Types
+namespace Core.Types
 {
     public class VehicleFilter : IFilter
     {

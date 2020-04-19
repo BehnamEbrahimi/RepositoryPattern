@@ -1,5 +1,4 @@
-﻿using System;
-using Domain;
+﻿using Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
@@ -9,6 +8,7 @@ namespace Persistence
         public DbSet<Make> Makes { get; set; }
         public DbSet<Model> Models { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

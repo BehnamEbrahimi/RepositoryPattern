@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain
+namespace Core.Domain
 {
     public class Vehicle
     {
@@ -30,9 +30,12 @@ namespace Domain
 
         public ICollection<VehicleFeature> Features { get; set; }
 
+        public ICollection<Photo> Photos { get; set; }
+
         public Vehicle()
         {
             Features = new Collection<VehicleFeature>();
+            Photos = new Collection<Photo>();
         }
     }
 }

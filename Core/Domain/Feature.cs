@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain
+namespace Core.Domain
 {
     public class Feature
     {

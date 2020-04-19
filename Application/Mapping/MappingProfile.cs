@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Application.Dtos;
 using AutoMapper;
-using Domain;
-using Domain.Types;
+using Core.Domain;
+using Core.Types;
 
 namespace Application.Mapping
 {
@@ -15,6 +15,7 @@ namespace Application.Mapping
             CreateMap<Make, IdNameDto>();
             CreateMap<Model, IdNameDto>();
             CreateMap<Feature, IdNameDto>();
+            CreateMap<Photo, PhotoDto>();
             CreateMap(typeof(Envelope<>), typeof(EnvelopeDto<>));
             CreateMap<Vehicle, SaveVehicleDto>()
                 .ForMember(svd => svd.Contact, opt => opt.MapFrom(v => new ContactDto { Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone }))

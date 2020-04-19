@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.Domain;
 
-namespace Domain.Interfaces
+namespace Core.Interfaces
 {
     public interface IMakeRepository
     {

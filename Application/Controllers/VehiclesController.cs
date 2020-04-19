@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Application.Dtos;
-using Domain;
-using Domain.Interfaces;
-using Domain.Types;
+using Core.Domain;
+using Core.Interfaces;
+using Core.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers

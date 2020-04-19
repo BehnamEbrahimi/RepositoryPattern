@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain
+namespace Core.Domain
 {
     public class Make
     {

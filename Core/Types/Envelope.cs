@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Domain.Types
+namespace Core.Types
 {
     public class Envelope<T>
     {

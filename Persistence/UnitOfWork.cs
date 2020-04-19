@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Domain.Interfaces;
+using Core.Interfaces;
 
 namespace Persistence
 {
