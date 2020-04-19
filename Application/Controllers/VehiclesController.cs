@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Application.Dtos;
 using Domain;
 using Domain.Interfaces;
+using Domain.Types;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers
@@ -79,7 +80,7 @@ namespace Application.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<VehicleDto>> Get(int id)
+        public async Task<ActionResult<VehicleDto>> Details(int id)
         {
             var vehicle = await _vehicleRepository.Details(id);
 
@@ -89,6 +90,15 @@ namespace Application.Controllers
             }
 
             return Mapper.Map<Vehicle, VehicleDto>(vehicle);
+        }
+
+        [HttpGet]
+        public async Task<EnvelopeDto<VehicleDto>> List([FromQuery] VehicleFilterDto filterDto)
+        {
+            var filter = Mapper.Map<VehicleFilterDto, VehicleFilter>(filterDto);
+            var envelope = await _vehicleRepository.List(filter);
+
+            return Mapper.Map<Envelope<Vehicle>, EnvelopeDto<VehicleDto>>(envelope);
         }
     }
 }

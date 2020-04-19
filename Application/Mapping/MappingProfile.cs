@@ -3,6 +3,7 @@ using System.Linq;
 using Application.Dtos;
 using AutoMapper;
 using Domain;
+using Domain.Types;
 
 namespace Application.Mapping
 {
@@ -14,6 +15,7 @@ namespace Application.Mapping
             CreateMap<Make, IdNameDto>();
             CreateMap<Model, IdNameDto>();
             CreateMap<Feature, IdNameDto>();
+            CreateMap(typeof(Envelope<>), typeof(EnvelopeDto<>));
             CreateMap<Vehicle, SaveVehicleDto>()
                 .ForMember(svd => svd.Contact, opt => opt.MapFrom(v => new ContactDto { Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone }))
                 .ForMember(svd => svd.Features, opt => opt.MapFrom(v => v.Features.Select(vf => vf.FeatureId)));
@@ -22,6 +24,7 @@ namespace Application.Mapping
                 .ForMember(vd => vd.Contact, opt => opt.MapFrom(v => new ContactDto { Name = v.ContactName, Email = v.ContactEmail, Phone = v.ContactPhone }))
                 .ForMember(vd => vd.Features, opt => opt.MapFrom(v => v.Features.Select(vf => new IdNameDto { Id = vf.FeatureId, Name = vf.Feautre.Name })));
 
+            CreateMap<VehicleFilterDto, VehicleFilter>();
             CreateMap<SaveVehicleDto, Vehicle>()
                 .ForMember(v => v.Id, opt => opt.Ignore())
                 .ForMember(v => v.ContactName, opt => opt.MapFrom(svd => svd.Contact.Name))
